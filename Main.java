@@ -46,7 +46,9 @@ public class Main {
             }else if (input.startsWith("create-group")) {
                 createGroup(input);
             }else if (input.startsWith("add-user")) {
-
+                addUser(input);
+            }else if (input.equals("show my groups")) {
+                dashboardController.showGroups(currentUser);
             }
         }
     }
@@ -129,7 +131,7 @@ public class Main {
             }
         }
         if (valid) {
-            Group newGroup = new Group(groupName, groupType,currentUser.getUsername());
+            Group newGroup = new Group(groupName, groupType,currentUser);
             groups.add(newGroup);
             System.out.println("group created successfully!");
         }
@@ -201,10 +203,7 @@ public class Main {
     }
     public static void signUpMenu (String input) {
         String[] parts = input.split(" ");
-        String username = null;
-        String password = null;
-        String email = null;
-        String name = null;
+        String username = null, password = null, email = null, name = null;
         boolean valid = true;
         for (int i = 0; i < parts.length; i++) {
             switch (parts[i]) {

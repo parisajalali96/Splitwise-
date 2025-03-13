@@ -57,4 +57,24 @@ public class DashboardController {
         return null;
     }
 
+    public static void showGroups (User user) {
+        for(Group group : groups) {
+            if(group.getMembers().contains(user)) {
+                groupPrint(group);
+            }
+        }
+    }
+
+    public static void groupPrint (Group group) {
+        System.out.println("group name : " + group.getName());
+        System.out.println("group id : " + group.getId());
+        System.out.println("type : " + group.getType());
+        System.out.println("creator : " + group.getCreator().getName());
+        System.out.println("members : ");
+        for (User user : group.getMembers()) {
+            System.out.println(user.getName());
+        }
+        System.out.println("--------------------");
+    }
+
 }

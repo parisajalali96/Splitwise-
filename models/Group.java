@@ -12,13 +12,14 @@ public class Group {
     private String name;
     private String type;
     private static int id = 1;
-    private String creator;
+    private User creator;
     private ArrayList<User> members = new ArrayList<>();
 
-    public Group(String name, String type, String creator) {
+    public Group(String name, String type, User creator) {
         this.name = name;
         this.type = type;
         this.creator = creator;
+        members.add(creator);
         id = ++Group.id;
     }
 
@@ -38,7 +39,7 @@ public class Group {
         return members;
     }
 
-    public String getCreator() {
+    public User getCreator() {
         return creator;
     }
 
