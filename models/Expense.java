@@ -7,5 +7,20 @@ Explanation:
  */
 
 public class Expense{
+    private int expense;
+    private User user;
+
+    public Expense (int expense, User user){
+        this.expense = expense;
+        this.user = user;
+    }
+
+    public int getExpense(){
+        return expense;
+    }
+
+    public User getUser(){
+        return user;
+    }
 
 }

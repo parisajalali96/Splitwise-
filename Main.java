@@ -6,9 +6,11 @@
 import controllers.DashboardController;
 import controllers.LoginMenuController;
 import controllers.SignUpMenuController;
+import models.Expense;
 import models.Group;
 import models.User;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
 
 
@@ -18,10 +20,10 @@ public class Main {
     private static LoginMenuController loginController = new LoginMenuController(users);
     private static SignUpMenuController signUpController = new SignUpMenuController(users);
     private static DashboardController dashboardController = new DashboardController(groups);
+    private static Scanner scanner = new Scanner(System.in);
     private static User currentUser = new User(null, null, null, null);
 
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
 
         boolean running = true;
         while (running) {
@@ -49,7 +51,97 @@ public class Main {
                 addUser(input);
             }else if (input.equals("show my groups")) {
                 dashboardController.showGroups(currentUser);
+            }else if (input.startsWith("add-expense")) {
+                addExpense(input);
             }
+        }
+    }
+
+    public static void addExpense(String input) {
+        String[] parts = input.split(" ");
+        int groupId = 1;
+        boolean equal = true;
+        int totalExpense = 0;
+        int userNum = 0;
+        boolean valid = true;
+
+        for (int i = 0; i < parts.length; i++) {
+            switch (parts[i]) {
+                case "-g": {
+                    groupId = Integer.parseInt(parts[i + 1]);
+                    if(!dashboardController.existGroup(groupId)) {
+                        System.out.println("group not found!");
+                        valid = false;
+                    }
+                    break;
+                }
+                case "-s": {
+                    if(parts[i+1].equals("equally")) equal = true;
+                    else equal = false;
+                    break;
+                }
+                case "-t": {
+                    String expense = parts[i+1];
+                    if(dashboardController.isExpenceValid(expense)) totalExpense += Integer.parseInt(expense);
+                    else {
+                        System.out.println("expense format is invalid!");
+                        valid = false;
+                    }
+                    break;
+                }
+                case "-n": {
+                    userNum = Integer.parseInt(parts[i+1]);
+                }
+            }
+        }
+        Group currentGroup = dashboardController.getGroup(groupId);
+        if(equal) {
+            ArrayList<User> users = new ArrayList<>();
+            for (int i = 0; i < userNum; i++) {
+                String user = scanner.nextLine();
+                if(currentGroup.getMembers().contains(user)) {
+                    users.add(currentUser);
+                } else {
+                    System.out.println(user + " not in group!");
+                    valid = false;
+                }
+            }
+        }else {
+            HashMap<User, Expense> users = new HashMap<>();
+            for (int i = 0; i < userNum; i++) {
+                String user = scanner.next();
+                User currentUser;
+                Expense currentExpense;
+                int expenseNum = 0;
+                if(currentGroup.getMembers().contains(user)) {
+                    String expense = scanner.next();
+                    if(dashboardController.isExpenceValid(expense)) {
+                        expenseNum = Integer.parseInt(expense);
+                    }else{
+                        System.out.println("expense format is invalid!");
+                        valid = false;
+                    }
+                }else{
+                    System.out.println(user + " not in group!");
+                    valid = false;
+                }
+                if(valid){
+                    currentUser = loginController.getUser(user);
+                    currentExpense = new Expense(expenseNum, currentUser);
+                    users.put(currentUser, currentExpense);
+                }
+                int sum = 0;
+                for(Expense expence : users.values()) {
+                    sum += expence.getExpense();
+                }
+                if(sum != totalExpense) {
+                    System.out.println("the sum of individual costs does not equal the total cost!");
+                    valid = false;
+                }
+            }
+        }
+        if(valid) {
+            System.out.println("expense added successfully!");
         }
     }
 

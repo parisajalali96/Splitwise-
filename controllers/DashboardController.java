@@ -77,4 +77,10 @@ public class DashboardController {
         System.out.println("--------------------");
     }
 
+    public static boolean isExpenceValid (String expence) {
+        return expence.matches("^\\d+$");
+    }
+
+
+
 }
