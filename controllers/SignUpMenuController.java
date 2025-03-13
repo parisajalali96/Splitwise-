@@ -16,6 +16,70 @@ public class SignUpMenuController {
         this.users = users;
     }
 
+    public static void signUpMenu (String input) {
+        SignUpMenuController signUpController = new SignUpMenuController(users);
+        String[] parts = input.split(" ");
+        String username = null;
+        String password = null;
+        String email = null;
+        String name = null;
+        boolean valid = true;
+        for (int i = 0; i < parts.length; i++) {
+            switch (parts[i]) {
+                case "-u" : {
+                    username = parts[i+1];
+                    if(!signUpController.isUsernameValid(username)) {
+                        System.out.println("username format is invalid!");
+                        valid = false;
+                    }
+                    if(!signUpController.isUsernameUnique(username)) {
+                        System.out.println("this username is already taken!");
+                        valid = false;
+                    }
+                    break;
+                }
+                case "-p" : {
+                    password = parts[i+1];
+                    if(!signUpController.isPasswordValid(password)) {
+                        System.out.println("password format is invalid!");
+                        valid = false;
+                    }
+                    break;
+                }
+                case "-e" : {
+                    email = parts[i+1];
+                    String [] emailParts = email.split("@");
+                    String emailUser = emailParts[0];
+
+                    String domainPart = emailParts[1];
+                    int dotIndex = domainPart.indexOf('.');
+                    String domain = domainPart.substring(0, dotIndex);
+                    String TLD = domainPart.substring(dotIndex+1);
+                    if (!signUpController.isUsernameValid(emailUser) ||
+                            !signUpController.isEmailDomainValid(domain) ||
+                            !signUpController.isEmailTLDValid(TLD)) {
+                        System.out.println("email format is invalid!");
+                        valid = false;
+                    }
+                    break;
+                }
+                case "-n" : {
+                    name = parts[i+1];
+                    if(!signUpController.isNameValid(name)) {
+                        System.out.println("name format is invalid!");
+                        valid = false;
+                    }
+                    break;
+                }
+            }
+        }
+        if (valid) {
+            User user = new User(username, password, email, name);
+            users.add(user);
+            System.out.println("user registered successfully.you are now in login menu!");
+        }
+    }
+
     public static boolean isUsernameValid (String username) {
         String regex = "^[a-zA-Z][a-zA-Z0-9._-]{2,8}[a-zA-Z]$";
         return username.matches(regex);
