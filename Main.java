@@ -12,7 +12,7 @@ import java.util.Scanner;
 
 public class Main {
     private static ArrayList<User> users = new ArrayList<>();
-    private static User currentUser;
+    private static User currentUser = new User(null, null, null, null);
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
@@ -24,13 +24,54 @@ public class Main {
                 break;
             }else if (input.startsWith("register")) {
                 signUpMenu(input);
+            }else if (input.equals("go to signup menu")) {
+                System.out.println("you are now in signup menu!");
+                String signup = scanner.nextLine();
+                signUpMenu(signup);
             }else if (input.equals("go to login menu")) {
+                System.out.println("you are now in login menu!");
                 String login = scanner.nextLine();
                 loginMenu(login);
+            }else if (input.startsWith("login")) {
+                loginMenu(input);
+            }else if (input.startsWith("forget-password")) {
+                forgotPasswordMenu(input);
             }
         }
     }
 
+    public static void forgotPasswordMenu(String input) {
+        LoginMenuController loginController = new LoginMenuController(users);
+        String[] parts = input.split(" ");
+        String username = null;
+        String password = null;
+        String email = null;
+        boolean valid = true;
+        for (int i = 0; i < parts.length; i++) {
+            switch (parts[i]) {
+                case "-u":{
+                    username = parts[i+1];
+                    if(!loginController.usernameExist(username)) {
+                        System.out.println("username doesn't exist!");
+                        valid = false;
+                    }
+                    break;
+                }
+                case "-e":{
+                    email = parts[i+1];
+                    if(!loginController.matchEmail(username, email)) {
+                        System.out.println("email doesn't match!");
+                        valid = false;
+                    }
+                    break;
+                }
+            }
+        }
+        if (valid) {
+            password = loginController.forgotPassword(username, email);
+            System.out.println("password :" + password);
+        }
+    }
     public static void loginMenu (String input){
         LoginMenuController loginController = new LoginMenuController(users);
         String[] parts = input.split(" ");
@@ -50,7 +91,7 @@ public class Main {
                 case "-p" : {
                     password = parts[i+1];
                     if(!valid) break;
-                    else if(!loginController.isPasswordValid(password, username)) {
+                    if(!loginController.isPasswordValid(password, username)) {
                         System.out.println("password is incorrect!");
                         valid = false;
                         break;

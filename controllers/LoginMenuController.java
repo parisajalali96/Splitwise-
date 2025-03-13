@@ -42,4 +42,22 @@ public class LoginMenuController {
         }
         return null;
     }
+
+    public static boolean matchEmail (String username, String email) {
+        for (User user : users) {
+            if (user.getUsername().equals(username) && user.getEmail().equals(email)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static String forgotPassword (String username, String email) {
+        for (User user : users) {
+            if (user.getUsername().equals(username) && user.getEmail().equals(email)) {
+                return user.getPassword();
+            }
+        }
+        return null;
+    }
 }
