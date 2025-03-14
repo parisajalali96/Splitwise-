@@ -5,6 +5,7 @@
 
 import controllers.DashboardController;
 import controllers.LoginMenuController;
+import controllers.ProfileMenuController;
 import controllers.SignUpMenuController;
 import models.Expense;
 import models.Group;
@@ -20,6 +21,7 @@ public class Main {
     private static LoginMenuController loginController = new LoginMenuController(users);
     private static SignUpMenuController signUpController = new SignUpMenuController(users);
     private static DashboardController dashboardController = new DashboardController(groups);
+    private static ProfileMenuController profileController = new ProfileMenuController();
     private static Scanner scanner = new Scanner(System.in);
     private static User currentUser = new User(null, null, null, null);
 
@@ -53,10 +55,123 @@ public class Main {
                 dashboardController.showGroups(currentUser);
             }else if (input.startsWith("add-expense")) {
                 addExpense(input);
+            }else if(input.equals("go to profile menu")) {
+                String profile = scanner.nextLine();
+                System.out.println("you are now in profile menu!");
+                profileMenu(profile);
+            }else if(input.equals("logout")) {
+                logOut();
+                continue;
+            }else if(input.equals("show user info")) {
+                profileController.showUserInfo(currentUser);
+            }else if(input.startsWith("change-currency")) {
+                changeCurrency(input);
+            }else if(input.startsWith("change-username")) {
+                changeUsername(input);
+            }else if(input.equals("change-password")) {
+                changePassword(input);
+            }else if(input.equals("back")) {
+                System.out.println("you are now in dashboard!");
+            }else {
+                System.out.println("invalid command!");
             }
         }
     }
 
+    public static void changePassword(String input) {
+        String[] parts = input.split(" ");
+        String newPassword = null;
+        String oldPassword = null;
+        boolean valid = true;
+        for (int i = 0; i < parts.length; i++) {
+            switch (parts[i]) {
+                case "-o": {
+                    oldPassword = parts[i + 1];
+                    if(!profileController.checkPassword(oldPassword, currentUser)) {
+                        System.out.println("password incorrect!");
+                        valid = false;
+                    }
+                    break;
+                }
+                case "-n": {
+                    newPassword = parts[i + 1];
+                    if(profileController.isPasswordNew(newPassword, currentUser)) {
+                        System.out.println("please enter a new password!");
+                        valid = false;
+                    }
+                    if(!signUpController.isPasswordValid(newPassword)) {
+                        System.out.println("new password format is invalid!");
+                        valid = false;
+                    }
+                    break;
+                }
+            }
+        }
+        if(valid) {
+            profileController.changePassword(newPassword, currentUser);
+        }
+        System.out.println("your password changed successfully!");
+    }
+
+    public static void changeUsername(String input) {
+        String[] parts = input.split(" ");
+        String username = null;
+        boolean valid = true;
+        for (int i = 0; i < parts.length; i++) {
+            switch (parts[i]) {
+                case "-n": {
+                    username = parts[i + 1];
+                    if(!signUpController.isUsernameValid(username)) {
+                        System.out.println("new username format is invalid!");
+                        valid = false;
+                    }
+                    if(profileController.checkUsername(currentUser, username)) {
+                        System.out.println("please enter a new username!");
+                        valid = false;
+                    }
+                    if(loginController.usernameExist(username)) {
+                        System.out.println("this username is already taken!");
+                        valid = false;
+                    }
+                    break;
+                }
+            }
+        }
+        if(valid) {
+            profileController.changeUsername(username, currentUser);
+        }
+        System.out.println("your username changed to " + username + " successfully!");
+    }
+
+    public static void changeCurrency(String input) {
+        String[] parts = input.split(" ");
+        String currency = null;
+        boolean valid = true;
+        for (int i = 0; i < parts.length; i++) {
+            switch (parts[i]) {
+                case "-n": {
+                    currency = parts[i + 1];
+                    if(!profileController.isCurrencyValid(currency)) {
+                        System.out.println("currency format is invalid!");
+                        valid = false;
+                    }
+                    break;
+                }
+            }
+        }
+        if(valid) {
+            profileController.changeCurrency(currency, currentUser);
+        }
+        System.out.println("your currency changed to " + currency + " successfully!");
+    }
+
+    public static void logOut(){
+        currentUser = new User(null, null, null, null);
+        System.out.println("user logged out successfully.you are now in login menu!");
+    }
+    public static void profileMenu(String input) {
+
+    }
     public static void addExpense(String input) {
         String[] parts = input.split(" ");
         int groupId = 1;
@@ -271,8 +386,8 @@ public class Main {
                     if (!loginController.usernameExist(username)) {
                         System.out.println("username doesn't exist!");
                         valid = false;
-                        break;
                     }
+                    break;
                 }
                 case "-p" : {
                     password = parts[i+1];
@@ -280,19 +395,19 @@ public class Main {
                     if(!loginController.isPasswordValid(password, username)) {
                         System.out.println("password is incorrect!");
                         valid = false;
-                        break;
                     }
-                }
-            }
-            if (valid) {
-                currentUser = loginController.findUser(username, password);
-                if (currentUser != null) {
-                    System.out.println("user logged in successfully.you are now in dashboard!");
+                    break;
                 }
             }
         }
-
+        if (valid) {
+            currentUser = loginController.findUser(username, password);
+            if (currentUser != null) {
+                System.out.println("user logged in successfully.you are now in dashboard!");
+            }
+        }
     }
+
     public static void signUpMenu (String input) {
         String[] parts = input.split(" ");
         String username = null, password = null, email = null, name = null;

@@ -11,7 +11,7 @@ import models.User;
 import java.util.ArrayList;
 
 public class LoginMenuController {
-    private static ArrayList<User> users = new ArrayList<User>();
+    private static ArrayList<User> users;
     public LoginMenuController(ArrayList<User> users) {
         this.users = users;
     }
