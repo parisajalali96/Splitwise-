@@ -7,6 +7,9 @@ Explanation:
 - you can put some functions here to manage the user data too.
  */
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class User {
     private String username;
     private String password;
@@ -40,6 +43,7 @@ public class User {
     public String getCurrency() {
         return currency;
     }
+
     public void setCurrency(String currency) {
         this.currency = currency;
     }

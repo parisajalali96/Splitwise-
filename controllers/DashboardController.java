@@ -1,5 +1,6 @@
 package controllers;
 
+import models.Expense;
 import models.Group;
 import models.User;
 
@@ -13,8 +14,11 @@ Explanation:
  */
 public class DashboardController {
     private static ArrayList<Group> groups = new ArrayList<>();
-    public DashboardController(ArrayList<Group> groups) {
+    private static ArrayList<Expense> expenses = new ArrayList<>();
+
+    public DashboardController(ArrayList<Group> groups, ArrayList<Expense> expenses) {
         this.groups = groups;
+        this.expenses = expenses;
     }
 
     public static boolean isGroupNameValid(String name) {
@@ -79,6 +83,45 @@ public class DashboardController {
 
     public static boolean isExpenceValid (String expence) {
         return expence.matches("^\\d+$");
+    }
+
+    public static void showBalance (User userCheck, User me) {
+        for (Expense expense : expenses) {
+            int[] groupIds = new int[0];
+            int groups = 0;
+            int debt = 0;
+            if (me.getUsername().equals(expense.getUserInDebt().getUsername()) && userCheck.getUsername().equals(expense.getUserOutDebt().getUsername())) {
+                groupIds[groups] = expense.getGroupId();
+                debt = expense.getExpense();
+                for (Expense exp : expenses) {
+                    if (userCheck.getUsername().equals(exp.getUserInDebt().getUsername()) && me.getUsername().equals(exp.getUserOutDebt().getUsername())) {
+                        debt -= exp.getExpense();
+                    }
+                }
+                System.out.print("you owe " + userCheck.getUsername() + " " + debt + " " + me.getCurrency() + " in ");
+                for (int i = 0; i < groupIds.length; i++) {
+                    Group group = getGroup(groupIds[i]);
+                    if (i != groups - 1) System.out.println(group.getName() + ", ");
+                    else System.out.println(group.getName() + "!");
+                }
+            } else if (me.getUsername().equals(expense.getUserOutDebt().getUsername()) && userCheck.getUsername().equals(expense.getUserInDebt().getUsername())) {
+                groupIds[groups] = expense.getGroupId();
+                debt = expense.getExpense();
+                for (Expense exp : expenses) {
+                    if (userCheck.getUsername().equals(exp.getUserOutDebt().getUsername()) && me.getUsername().equals(exp.getUserInDebt().getUsername())) {
+                        debt -= exp.getExpense();
+                    }
+                }
+                System.out.print(userCheck.getUsername() + " owes you " + debt + " " + me.getCurrency() + " in ");
+                for (int i = 0; i < groupIds.length; i++) {
+                    Group group = getGroup(groupIds[i]);
+                    if (i != groups - 1) System.out.println(group.getName() + ", ");
+                    else System.out.println(group.getName() + "!");
+                }
+            }else {
+                System.out.println("you are settled with " + userCheck.getUsername());
+            }
+        }
     }
 
 

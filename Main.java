@@ -18,9 +18,10 @@ import java.util.Scanner;
 public class Main {
     private static ArrayList<User> users = new ArrayList<>();
     private static ArrayList<Group> groups = new ArrayList<>();
+    private static ArrayList<Expense> expenses = new ArrayList<>();
     private static LoginMenuController loginController = new LoginMenuController(users);
     private static SignUpMenuController signUpController = new SignUpMenuController(users);
-    private static DashboardController dashboardController = new DashboardController(groups);
+    private static DashboardController dashboardController = new DashboardController(groups, expenses);
     private static ProfileMenuController profileController = new ProfileMenuController();
     private static Scanner scanner = new Scanner(System.in);
     private static User currentUser = new User(null, null, null, null);
@@ -72,12 +73,33 @@ public class Main {
                 changePassword(input);
             }else if(input.equals("back")) {
                 System.out.println("you are now in dashboard!");
+            }else if(input.startsWith("show-balance")) {
+                showBalance(input);
             }else {
                 System.out.println("invalid command!");
             }
         }
     }
 
+    public static void showBalance(String input) {
+        String[] parts = input.split(" ");
+        String username = null;
+        boolean valid = true;
+        for (int i = 0; i < parts.length; i++) {
+            switch (parts[i]) {
+                case "-u": {
+                    username = parts[i + 1];
+                    if(!loginController.usernameExist(username)) {
+                        System.out.println("user not found!");
+                        valid = false;
+                    }
+                }
+            }
+        }
+        if(valid) {
+            dashboardController.showBalance(loginController.getUser(username), currentUser);
+        }
+    }
     public static void changePassword(String input) {
         String[] parts = input.split(" ");
         String newPassword = null;
@@ -221,11 +243,19 @@ public class Main {
                     valid = false;
                 }
             }
+            if(valid) {
+                int expenseEach = totalExpense / userNum;
+                for(int i = 0; i < userNum; i++) {
+                    Expense newExpence = new Expense (expenseEach, users.get(i), currentUser, currentGroup.getId());
+                }
+            }
+
         }else {
-            HashMap<User, Expense> users = new HashMap<>();
+            ArrayList<User> users2 = new ArrayList<>();
+            ArrayList<Expense> expenses2 = new ArrayList<>();
             for (int i = 0; i < userNum; i++) {
                 String user = scanner.next();
-                User currentUser;
+                User currentInDebt;
                 Expense currentExpense;
                 int expenseNum = 0;
                 if(currentGroup.getMembers().contains(user)) {
@@ -241,17 +271,23 @@ public class Main {
                     valid = false;
                 }
                 if(valid){
-                    currentUser = loginController.getUser(user);
-                    currentExpense = new Expense(expenseNum, currentUser);
-                    users.put(currentUser, currentExpense);
+                    currentInDebt = loginController.getUser(user);
+                    currentExpense = new Expense(expenseNum,currentInDebt, currentUser, groupId);
+                    expenses2.add(currentExpense);
+                    users2.add(currentInDebt);
                 }
                 int sum = 0;
-                for(Expense expence : users.values()) {
+                for(Expense expence : expenses2) {
                     sum += expence.getExpense();
                 }
                 if(sum != totalExpense) {
                     System.out.println("the sum of individual costs does not equal the total cost!");
                     valid = false;
+                }
+            }
+            if(valid) {
+                for(Expense expense : expenses2) {
+                    expenses.add(expense);
                 }
             }
         }

@@ -8,19 +8,30 @@ Explanation:
 
 public class Expense{
     private int expense;
-    private User user;
+    private User inDebt;
+    private User outDebt;
+    private int groupId;
 
-    public Expense (int expense, User user){
+
+    public Expense (int expense, User outDebt, User inDebt, int groupId){
         this.expense = expense;
-        this.user = user;
+        this.outDebt = outDebt;
+        this.inDebt = inDebt;
+        this.groupId = groupId;
     }
 
     public int getExpense(){
         return expense;
     }
 
-    public User getUser(){
-        return user;
+    public User getUserInDebt(){
+        return inDebt;
+    }
+    public User getUserOutDebt(){
+        return outDebt;
+    }
+    public int getGroupId(){
+        return groupId;
     }
 
 }

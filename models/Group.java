@@ -20,7 +20,7 @@ public class Group {
         this.type = type;
         this.creator = creator;
         members.add(creator);
-        id = ++Group.id;
+        id = Group.id++;
     }
 
     public String getName() {
